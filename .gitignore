@@ -27,3 +27,11 @@
 *.i*86
 *.x86_64
 *.hex
+
+# eclipse files/dirs
+.cproject
+.project
+.settings
+
+# build dirs
+firmware
