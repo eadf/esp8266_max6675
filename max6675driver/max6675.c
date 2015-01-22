@@ -128,7 +128,7 @@ max6675_readTempAsString(char *buf, int bufLen, int *bytesWritten, bool celcius)
   bool rv = max6675_readTemp(&sample, celcius);
   if(rv){
     *bytesWritten = max6675_float_2_string(100.0*sample, 100, buf, bufLen);
-    if (bufLen >= *bytesWritten+3){
+    if (celcius && (bufLen >= *bytesWritten+3)){
       buf[*bytesWritten] = 0xC2;  // UTF8 º
       buf[*bytesWritten+1] = 0xB0;
       buf[*bytesWritten+2] = 'C';
