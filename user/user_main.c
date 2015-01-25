@@ -10,8 +10,12 @@
 #define user_procTaskQueueLen    1
 os_event_t user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
-
 static volatile os_timer_t some_timer;
+
+static const int ICS_PIN=2;   // !Chip Select: This is GIOP2, connect a 10K pull down resistor to GND to avoid problems with the bootloader starting
+static const int CLOCK_PIN=0; // Clock       : This is GIOP0, connect a 10K pull up resistor to Vcc to avoid problems with the bootloader starting
+static const int SO_PIN=3;    // Slave Output: This pin is normally RX. So don't have your hardware connected while flashing.
+
 
 #define TEXTBUFFERSIZE 128
 static char txtbuffer[TEXTBUFFERSIZE];
@@ -42,7 +46,8 @@ user_init() {
 
   // Initialize the GPIO subsystem.
   gpio_init();
-  max6675_init();
+
+  max6675_init(ICS_PIN, CLOCK_PIN, SO_PIN);
 
   //Disarm timer
   os_timer_disarm(&some_timer);
