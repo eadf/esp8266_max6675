@@ -11,6 +11,7 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #include "math.h"
+#include "easygpio/easygpio.h"
 
 static uint16_t ICS_PIN=2;   // !Chip Select: This is GIOP2, connect a 10K pull down resistor to GND to avoid problems with the bootloader starting
 static uint16_t CLOCK_PIN=0; // Clock       : This is GIOP0, connect a 10K pull up resistor to Vcc to avoid problems with the bootloader starting
@@ -159,121 +160,6 @@ max6675_float2string(float sample, int divisor, char *buf, int bufLen) {
   return l;
 }
 
-/**
- * Sets each port found in the gpioMask as a GPIO.
- *  e.g. gpioMask=1 (bit 0 raised) will set PERIPHS_IO_MUX_GPIO0_U as FUNC_GPIO0
- */
-bool ICACHE_FLASH_ATTR
-max6675_enableGPIOs(uint32_t gpioMask) {
-  {
-    int i,numberOfPins=0;
-    for (i=0; i<32; i++){
-      numberOfPins += (gpioMask & 1<<i)?1:0;
-    }
-    if (numberOfPins!=3) {
-      os_printf("max6675_enableGPIOs Error: you must specify exactly 3 unique pin numbers\n");
-      return false;
-    }
-  }
-
-  if (gpioMask & 1<<6) {
-    os_printf("max6675_enableGPIOs Error: There is no GPIO6, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<7) {
-    os_printf("max6675_enableGPIOs Error: There is no GPIO7, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<8) {
-    os_printf("max6675_enableGPIOs Error: There is no GPIO8, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<11) {
-    os_printf("max6675_enableGPIOs Error: There is no GPIO11, check your code\n");
-    return false;
-  }
-  if (gpioMask & 1<<16) {
-    os_printf("max6675_enableGPIOs Error: GPIO16 not implemented yet\n");
-    return false;
-  }
-  if (gpioMask>>17) {
-    os_printf("max6675_enableGPIOs Error: GPIO17 and up does not exist. Check your code\n");
-    return false;
-  }
-
-  if (gpioMask & 1<<0) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO0_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO0_U);
-    //os_printf("Enabled GPIO0\n");
-  }
-  if (gpioMask & 1<<1) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_U0TXD_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0TXD_U);
-    //os_printf("Enabled GPIO1\n");
-  }
-  if (gpioMask & 1<<2) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO2_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
-    //os_printf("Enabled GPIO2\n");
-  }
-  if (gpioMask & 1<<3) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_GPIO3);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_U0RXD_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0RXD_U);
-    //os_printf("Enabled GPIO3\n");
-  }
-  if (gpioMask & 1<<4) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO4_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO4_U);
-    //os_printf("Enabled GPIO4\n");
-  }
-  if (gpioMask & 1<<5) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_GPIO5_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO5_U);
-    //os_printf("Enabled GPIO5\n");
-  }
-  if (gpioMask & 1<<9) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_SD_DATA2_U, FUNC_GPIO9);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_SD_DATA2_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_SD_DATA2_U);
-    //os_printf("Enabled GPIO9\n");
-  }
-  if (gpioMask & 1<<10) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_SD_DATA3_U, FUNC_GPIO10);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_SD_DATA3_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_SD_DATA3_U);
-    //os_printf("Enabled GPIO10\n");
-  }
-  if (gpioMask & 1<<12) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTDI_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTDI_U);
-    //os_printf("Enabled GPIO12\n");
-  }
-  if (gpioMask & 1<<13) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_GPIO13);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTCK_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTCK_U);
-    //os_printf("Enabled GPIO13\n");
-  }
-  if (gpioMask & 1<<14) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);
-    //os_printf("Enabled GPIO14\n");
-  }
-  if (gpioMask & 1<<15) {
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_GPIO15);
-    PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTDO_U);
-    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTDO_U);
-    //os_printf("Enabled GPIO15\n");
-  }
-}
 
 /******************************************************************************
  * FunctionName : max6675_init
@@ -282,9 +168,9 @@ max6675_enableGPIOs(uint32_t gpioMask) {
  * Parameters   : icsPin: inverted chip select pin
  *              : clockPin: clock pin
  *              : soPin:    slave out pin
- * Returns      :
+ * Returns      : true if init succeeded
 *******************************************************************************/
-void ICACHE_FLASH_ATTR
+bool ICACHE_FLASH_ATTR
 max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin ) {
 
  ICS_PIN = icsPin;
@@ -292,8 +178,15 @@ max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin ) {
  SO_PIN = soPin;
 
   // Define each used pin as a GPIO
-  if (!max6675_enableGPIOs(1<<ICS_PIN|1<<CLOCK_PIN|1<<SO_PIN)) {
-    return;
+  if(easygpio_countBits(1<<ICS_PIN|1<<CLOCK_PIN|1<<SO_PIN)!=3) {
+    os_printf("max6675_init:Error: you must provide exactly 3 unique I/O pins\n");
+    return false;
+  }
+
+  if (!(easygpio_pinMode(ICS_PIN, NOPULL, OUTPUT) &&
+        easygpio_pinMode(CLOCK_PIN, NOPULL, OUTPUT) &&
+        easygpio_pinMode(SO_PIN, NOPULL, INPUT))) {
+    return false;
   }
 
   max6675_digitalWrite(ICS_PIN, true);
@@ -301,9 +194,10 @@ max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin ) {
   GPIO_DIS_OUTPUT(SO_PIN);
 
   os_printf("\nInitiated max6675\n");
-  os_printf(" !CS   PIN=%d\n", ICS_PIN);
-  os_printf(" CLOCK PIN=%d\n", CLOCK_PIN);
-  os_printf(" SO    PIN=%d\n\n", SO_PIN);
+  os_printf(" !CS   = GPIO%d\n", ICS_PIN);
+  os_printf(" CLOCK = GPIO%d\n", CLOCK_PIN);
+  os_printf(" SO    = GPIO%d\n\n", SO_PIN);
 
   max6675_isConfigured = true;
+  return true;
 }

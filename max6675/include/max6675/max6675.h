@@ -11,7 +11,7 @@
 #define INCLUDE_DRIVER_MAX6675_H_
 
 #include "c_types.h"
-void max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin );
+bool max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin );
 
 bool max6675_readTemp(float* sample, bool celcius);
 int max6675_float2string(float sample, int divisor, char *buf, int bufLen);
