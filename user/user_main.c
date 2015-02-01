@@ -52,12 +52,14 @@ setup(void) {
   const int CLOCK_PIN=0; // Clock       : This is GIOP0, connect a 10K pull up resistor to Vcc to avoid problems with the bootloader starting
   const int SO_PIN=3;    // Slave Output: This pin is normally RX. So don't have your hardware connected while flashing.
 
-  max6675_init(ICS_PIN, CLOCK_PIN, SO_PIN);
-
-  // Start repeating loop timer
-  os_timer_disarm(&loop_timer);
-  os_timer_setfn(&loop_timer, (os_timer_func_t *) loop, NULL);
-  os_timer_arm(&loop_timer, 500, 1);
+  if (max6675_init(ICS_PIN, CLOCK_PIN, SO_PIN)) {
+    // Start repeating loop timer
+    os_timer_disarm(&loop_timer);
+    os_timer_setfn(&loop_timer, (os_timer_func_t *) loop, NULL);
+    os_timer_arm(&loop_timer, 500, 1);
+  } else {
+    os_printf("max6675_init failed, aborting\n");
+  }
 }
 
 
