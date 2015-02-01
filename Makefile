@@ -25,7 +25,7 @@ ESPPORT		?= /dev/ttyUSB0
 TARGET		= app
 
 # which modules (subdirectories) of the project to include in compiling
-MODULES		= max6675driver driver user
+MODULES		= easygpio max6675 driver user
 EXTRA_INCDIR    = include /opt/Espressif/include
 
 # libraries used in this project, mainly provided by the SDK
@@ -131,7 +131,7 @@ firmware:
 
 flash: firmware/0x00000.bin firmware/0x40000.bin
 	#$(PYTHON)  ~/Develop/workspace-arduino/ProMiniBootloader/upload.py /dev/ttyACM0 9600 bypass reset 
-	-$(ESPTOOL) --port $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x40000 firmware/0x40000.bin
+	$(ESPTOOL) --port $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x40000 firmware/0x40000.bin
 	#$(PYTHON) ~/Develop/workspace-arduino/ProMiniBootloader/upload.py /dev/ttyACM0 9600 normal
 
 test: flash
