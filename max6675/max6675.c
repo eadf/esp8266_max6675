@@ -6,7 +6,7 @@
  * this library is public domain. enjoy!
  * www.ladyada.net/learn/sensors/thermocouple
  */
-#include "max6675driver/max6675.h"
+#include "max6675/max6675.h"
 #include "gpio.h"
 #include "ets_sys.h"
 #include "osapi.h"
@@ -299,5 +299,11 @@ max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin ) {
   max6675_digitalWrite(ICS_PIN, true);
   max6675_digitalWrite(CLOCK_PIN, false);
   GPIO_DIS_OUTPUT(SO_PIN);
+
+  os_printf("\nInitiated max6675\n");
+  os_printf(" !CS   PIN=%d\n", ICS_PIN);
+  os_printf(" CLOCK PIN=%d\n", CLOCK_PIN);
+  os_printf(" SO    PIN=%d\n\n", SO_PIN);
+
   max6675_isConfigured = true;
 }

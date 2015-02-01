@@ -5,22 +5,32 @@
 #include "user_config.h"
 #include "user_interface.h"
 #include "driver/stdout.h"
+#include "max6675/max6675.h"
 
 #define user_procTaskPrio        0
 #define user_procTaskQueueLen    1
 os_event_t user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
-static volatile os_timer_t some_timer;
-
-static const int ICS_PIN=2;   // !Chip Select: This is GIOP2, connect a 10K pull down resistor to GND to avoid problems with the bootloader starting
-static const int CLOCK_PIN=0; // Clock       : This is GIOP0, connect a 10K pull up resistor to Vcc to avoid problems with the bootloader starting
-static const int SO_PIN=3;    // Slave Output: This pin is normally RX. So don't have your hardware connected while flashing.
-
+static volatile os_timer_t loop_timer;
 
 #define TEXTBUFFERSIZE 128
 static char txtbuffer[TEXTBUFFERSIZE];
 
-void some_timerfunc(void *arg) {
+// forward declaratons
+void loop(void);
+static void setup(void);
+
+//Do nothing function, main system task
+static void ICACHE_FLASH_ATTR
+user_procTask(os_event_t *events) {
+  os_delay_us(10);
+}
+
+/**
+ * This is the main user program loop
+ */
+void ICACHE_FLASH_ATTR
+loop(void) {
   int bytesWritten = 0;
   if (max6675_readTempAsString(txtbuffer, TEXTBUFFERSIZE, &bytesWritten, true)) {
     os_printf("max6675 sensor: %s\r\n", txtbuffer);
@@ -29,11 +39,27 @@ void some_timerfunc(void *arg) {
   }
 }
 
-//Do nothing function
+/**
+ * Setup program. When user_init() runs the debug printouts will not always
+ * show on the serial console. So i run the inits in here, 2 seconds later.
+ */
 static void ICACHE_FLASH_ATTR
-user_procTask(os_event_t *events) {
-  os_delay_us(10);
+setup(void) {
+
+  // Initialize the GPIO subsystem.
+  gpio_init();
+  const int ICS_PIN=2;   // !Chip Select: This is GIOP2, connect a 10K pull down resistor to GND to avoid problems with the bootloader starting
+  const int CLOCK_PIN=0; // Clock       : This is GIOP0, connect a 10K pull up resistor to Vcc to avoid problems with the bootloader starting
+  const int SO_PIN=3;    // Slave Output: This pin is normally RX. So don't have your hardware connected while flashing.
+
+  max6675_init(ICS_PIN, CLOCK_PIN, SO_PIN);
+
+  // Start repeating loop timer
+  os_timer_disarm(&loop_timer);
+  os_timer_setfn(&loop_timer, (os_timer_func_t *) loop, NULL);
+  os_timer_arm(&loop_timer, 500, 1);
 }
+
 
 //Init function 
 void ICACHE_FLASH_ATTR
@@ -41,25 +67,13 @@ user_init() {
   // Make os_printf working again. Baud:115200,n,8,1
   stdoutInit();
 
-  //Set station mode
+  //turn off wifi - it's not needed in this demo
   wifi_set_opmode( NULL_MODE );
 
-  // Initialize the GPIO subsystem.
-  gpio_init();
-
-  max6675_init(ICS_PIN, CLOCK_PIN, SO_PIN);
-
-  //Disarm timer
-  os_timer_disarm(&some_timer);
-
-  //Setup timer
-  os_timer_setfn(&some_timer, (os_timer_func_t *) some_timerfunc, NULL);
-
-  //Arm the timer
-  //&some_timer is the pointer
-  //1000 is the fire time in ms
-  //0 for once and 1 for repeating
-  os_timer_arm(&some_timer, 1000, 1);
+  // Run setup() 2 seconds from now
+  os_timer_disarm(&loop_timer);
+  os_timer_setfn(&loop_timer, (os_timer_func_t *) setup, NULL);
+  os_timer_arm(&loop_timer, 3000, 0);
 
   //Start os task
   system_os_task(user_procTask, user_procTaskPrio, user_procTaskQueue, user_procTaskQueueLen);
