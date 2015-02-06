@@ -66,11 +66,15 @@ setup(void) {
 //Init function 
 void ICACHE_FLASH_ATTR
 user_init() {
-  // Make os_printf working again. Baud:115200,n,8,1
+  // Make uart0 work with just the TX pin. Baud:115200,n,8,1
+  // The RX pin is now free for GPIO use.
   stdoutInit();
 
   //turn off wifi - it's not needed in this demo
-  wifi_set_opmode( NULL_MODE );
+  //wifi_set_opmode(NULL_MODE); // NULL_MODE will crash the system under 0.9.5. It works with 0.9.4.
+
+  //if you flash your device with code that sets NULL_MODE it will remain in the system
+  //until you flash the device with code that actively sets opmode to something useful.
 
   // Run setup() 2 seconds from now
   os_timer_disarm(&loop_timer);
