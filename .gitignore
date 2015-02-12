@@ -37,4 +37,5 @@ Makefile
 .settings
 
 # build dirs
-firmware
+
+build
