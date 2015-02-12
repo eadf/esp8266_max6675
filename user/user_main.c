@@ -19,6 +19,7 @@ static char txtbuffer[TEXTBUFFERSIZE];
 // forward declaratons
 void loop(void);
 static void setup(void);
+void user_init(void);
 
 //Do nothing function, main system task
 static void ICACHE_FLASH_ATTR
