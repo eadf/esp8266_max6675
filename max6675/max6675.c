@@ -183,9 +183,9 @@ max6675_init(uint16_t icsPin, uint16_t clockPin, uint16_t soPin ) {
     return false;
   }
 
-  if (!(easygpio_pinMode(ICS_PIN, NOPULL, OUTPUT) &&
-        easygpio_pinMode(CLOCK_PIN, NOPULL, OUTPUT) &&
-        easygpio_pinMode(SO_PIN, NOPULL, INPUT))) {
+  if (!(easygpio_pinMode(ICS_PIN, EASYGPIO_NOPULL, EASYGPIO_OUTPUT) &&
+        easygpio_pinMode(CLOCK_PIN, EASYGPIO_NOPULL, EASYGPIO_OUTPUT) &&
+        easygpio_pinMode(SO_PIN, EASYGPIO_NOPULL, EASYGPIO_INPUT))) {
     return false;
   }
 
