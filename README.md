@@ -48,6 +48,5 @@ make clean && make test
 ```
 
 You won't be needing esptool, my makefiles only uses esptool.py (provided by esp-open-sdk)
-(The makefiles under examples still uses esptool. I'll fix that soon)
 
 I have tested this with sdk v0.9.5 and v0.9.4 (linux & mac makefile)
