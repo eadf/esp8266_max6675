@@ -97,7 +97,7 @@ endif
 
 
 # which modules (subdirectories) of the project to include in compiling
-MODULES		 = driver/easygpio max6675 driver user
+MODULES		 = driver/easygpio max6675 driver/stdout user
 EXTRA_INCDIR = include $(SDK_BASE)/../include
 
 # libraries used in this project, mainly provided by the SDK
